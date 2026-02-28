@@ -29,6 +29,7 @@ pipeline {
                 script {
                     withAWS(credentials: 'AWS_CRED', region: "${AWS_REGION}") {
                         sh '''
+                            #!/bin/bash
                             set -euxo pipefail
 
                             echo "===== AWS CLI Version ====="
