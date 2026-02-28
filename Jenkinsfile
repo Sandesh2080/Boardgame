@@ -26,12 +26,9 @@ pipeline {
 
         stage('Login to ECR') {
             steps {
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'AWS_CREDENTIALS'
-                ]]) {
+                withAWS(credentials: 'AWS_CREDENTIALS', region: "${AWS_REGION}") {
                     sh '''
-                        aws --region ${AWS_REGION} ecr get-login-password \
+                        aws ecr get-login-password \
                         | podman login \
                             --username AWS \
                             --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
