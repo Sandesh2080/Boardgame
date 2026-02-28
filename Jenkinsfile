@@ -2,10 +2,10 @@ pipeline {
     agent { label 'podman' }
 
     environment {
-        AWS_ACCOUNT_ID  = "${env.AWS_ACCOUNT_ID}"
-        AWS_REGION      = "${env.AWS_REGION ?: 'us-east-1'}"
-        IMAGE_NAME      = "board-game"
-        ECR_REPO        = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}"
+        AWS_ACCOUNT_ID = "${env.AWS_ACCOUNT_ID}"
+        AWS_REGION     = "${env.AWS_REGION ?: 'us-east-1'}"
+        IMAGE_NAME     = "board-game"
+        ECR_REPO       = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}"
     }
 
     stages {
@@ -24,34 +24,44 @@ pipeline {
             }
         }
 
-        stage('Login to ECR') {
+        stage('Build & Push to ECR') {
             steps {
-                withAWS(credentials: 'AWS_CREDENTIALS', region: "${AWS_REGION}") {
-                    sh '''
-                        aws ecr get-login-password \
-                        | podman login \
-                            --username AWS \
-                            --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-                    '''
+                script {
+                    withAWS(credentials: 'AWS_CREDENTIALS', region: "${AWS_REGION}") {
+                        sh '''
+                            set -euxo pipefail
+
+                            echo "===== AWS CLI Version ====="
+                            aws --version
+
+                            echo "===== Logging into ECR ====="
+                            aws ecr get-login-password \
+                                | podman login \
+                                    --username AWS \
+                                    --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+
+                            echo "===== Tagging Image ====="
+                            podman tag ${IMAGE_NAME}:latest \
+                                ${ECR_REPO}:latest
+
+                            echo "===== Pushing Image ====="
+                            podman push \
+                                ${ECR_REPO}:latest
+
+                            echo "===== DONE ====="
+                        '''
+                    }
                 }
             }
         }
-
-        stage('Tag & Push Image') {
-            steps {
-                sh '''
-                    podman tag ${IMAGE_NAME}:latest ${ECR_REPO}:latest
-                    podman push ${ECR_REPO}:latest
-                '''
-            }
-        }
     }
+
     post {
         always {
             cleanWs()
         }
         success {
-            echo "Images pushed to ECR: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_PREFIX}"
+            echo "Image pushed to ECR: ${ECR_REPO}:latest"
         }
     }
 }
