@@ -21,8 +21,7 @@ pipeline {
                 sh '''
                     podman build \
                       -t ${IMAGE_NAME}:latest \
-                      -f offer-service/Dockerfile \
-                      offer-service
+                      -f Boardgame/Dockerfile
                 '''
             }
         }
