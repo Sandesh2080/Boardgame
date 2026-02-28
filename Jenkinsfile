@@ -4,7 +4,7 @@ pipeline {
     environment {
         AWS_ACCOUNT_ID = "${env.AWS_ACCOUNT_ID}"
         AWS_REGION     = "${env.AWS_REGION ?: 'us-east-1'}"
-        IMAGE_NAME     = "board-game"
+        IMAGE_NAME     = "dev/microsvc"
         ECR_REPO       = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}"
     }
 
@@ -19,7 +19,7 @@ pipeline {
         stage('Build Image') {
             steps {
                 sh '''
-                    podman build -t ${IMAGE_NAME} .
+                    podman build -t board-game .
                 '''
             }
         }
@@ -42,7 +42,7 @@ pipeline {
                                     --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
                             echo "===== Tagging Image ====="
-                            podman tag ${IMAGE_NAME}:latest \
+                            podman tag board-game:latest \
                                 ${ECR_REPO}:latest
 
                             echo "===== Pushing Image ====="
