@@ -49,4 +49,12 @@ pipeline {
             }
         }
     }
+    post {
+        always {
+            cleanWs()
+        }
+        success {
+            echo "Images pushed to ECR: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_PREFIX}"
+        }
+    }
 }
