@@ -5,7 +5,7 @@ pipeline {
         AWS_ACCOUNT_ID = "${env.AWS_ACCOUNT_ID}"
         AWS_REGION     = "${env.AWS_REGION ?: 'us-east-1'}"
         IMAGE_NAME     = "dev/microsvc"
-        ECR_REPO       = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}"
+        ECR_REPO       = "045973518289.dkr.ecr.us-east-1.amazonaws.com/dev/microsvc"
     }
 
     stages {
