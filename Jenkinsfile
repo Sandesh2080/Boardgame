@@ -27,7 +27,7 @@ pipeline {
         stage('Build & Push to ECR') {
             steps {
                 script {
-                    withAWS(credentials: 'AWS_CREDENTIALS', region: "${AWS_REGION}") {
+                    withAWS(credentials: 'AWS_CRED', region: "${AWS_REGION}") {
                         sh '''
                             set -euxo pipefail
 
