@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { lable 'podman' }
 
     environment {
         AWS_ACCOUNT_ID = "${env.AWS_ACCOUNT_ID}"
