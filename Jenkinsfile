@@ -19,8 +19,7 @@ pipeline {
         stage('Build Image') {
             steps {
                 sh '''
-                    podman build \
-                      -t ${IMAGE_NAME}:latest \
+                    podman build -t ${IMAGE_NAME} .
                 '''
             }
         }
