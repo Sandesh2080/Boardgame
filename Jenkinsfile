@@ -4,7 +4,7 @@ pipeline {
     environment {
         AWS_ACCOUNT_ID  = "${env.AWS_ACCOUNT_ID}"
         AWS_REGION      = "${env.AWS_REGION ?: 'us-east-1'}"
-        IMAGE_NAME      = "Board-game"
+        IMAGE_NAME      = "board-game"
         ECR_REPO        = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}"
     }
 
