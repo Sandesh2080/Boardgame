@@ -21,7 +21,6 @@ pipeline {
                 sh '''
                     podman build \
                       -t ${IMAGE_NAME}:latest \
-                      -f Boardgame/Dockerfile
                 '''
             }
         }
