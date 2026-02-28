@@ -1,38 +1,32 @@
 pipeline {
     agent { label 'podman' }
 
-    tools {
-        maven 'M3'
-    }
-
     environment {
-        AWS_ACCOUNT_ID   = "${env.AWS_ACCOUNT_ID}"    // configure in job or via parameters
-        AWS_REGION       = "${env.AWS_REGION ?: 'us-east-1'}"
-        ECR_REPO_PREFIX  = "${env.ECR_REPO_PREFIX ?: 'myorg'}"
-
-        // A comma‑separated list of module names matching subdirs
-        SERVICES         = "api-gateway,offer-service,product-service,service-registry"
+        AWS_ACCOUNT_ID  = "${env.AWS_ACCOUNT_ID}"
+        AWS_REGION      = "${env.AWS_REGION ?: 'us-east-1'}"
+        IMAGE_NAME      = "Board-game"
+        ECR_REPO        = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${IMAGE_NAME}"
     }
-    
-    stages {   
-        stage('Compile') {
+
+    stages {
+
+        stage('Build Application') {
             steps {
-            sh 'mvn compile'
+                sh 'mvn clean package -DskipTests'
             }
         }
-        
-        stage('Test') {
+
+        stage('Build Image') {
             steps {
-                sh 'mvn test'
+                sh '''
+                    podman build \
+                      -t ${IMAGE_NAME}:latest \
+                      -f offer-service/Dockerfile \
+                      offer-service
+                '''
             }
         }
-        
-        stage('Build') {
-            steps {
-                sh 'mvn package'
-            }
-        }
-        
+
         stage('Login to ECR') {
             steps {
                 withCredentials([[
@@ -41,11 +35,20 @@ pipeline {
                 ]]) {
                     sh '''
                         aws --region ${AWS_REGION} ecr get-login-password \
-                            | docker login \
-                                --username AWS \
-                                --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+                        | podman login \
+                            --username AWS \
+                            --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
                     '''
                 }
+            }
+        }
+
+        stage('Tag & Push Image') {
+            steps {
+                sh '''
+                    podman tag ${IMAGE_NAME}:latest ${ECR_REPO}:latest
+                    podman push ${ECR_REPO}:latest
+                '''
             }
         }
     }
