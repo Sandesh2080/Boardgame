@@ -1,9 +1,17 @@
 pipeline {
-    agent any
-    
+    agent { label 'podman' }
+
     tools {
-        jdk 'jdk17'
-        maven 'maven3'
+        maven 'M3'
+    }
+
+    environment {
+        AWS_ACCOUNT_ID   = "${env.AWS_ACCOUNT_ID}"    // configure in job or via parameters
+        AWS_REGION       = "${env.AWS_REGION ?: 'us-east-1'}"
+        ECR_REPO_PREFIX  = "${env.ECR_REPO_PREFIX ?: 'myorg'}"
+
+        // A comma‑separated list of module names matching subdirs
+        SERVICES         = "api-gateway,offer-service,product-service,service-registry"
     }
     
     stages {   
