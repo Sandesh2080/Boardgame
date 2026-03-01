@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: board-game
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oard-game
+  template:
+    metadata:
+      labels:
+        app: oard-game
+    spec:
+      containers:
+      - name: kube-container
+        # Replace with your actual ECR Image URI
+        image: 045973518289.dkr.ecr.us-east-1.amazonaws.com/dev/microsvc
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+      - name: ecr-registry-helper  # <--- THIS MUST MATCH THE SECRET NAME
