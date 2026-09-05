@@ -1,0 +1,73 @@
+pipeline {
+    agent any
+    
+    environment {
+        // Core Variables - Update your AWS Account ID here
+        AWS_ACCOUNT_ID = '045973518289' 
+        AWS_REGION     = 'us-east-1'
+        ECR_REPO       = 'dev/microsvc'
+        
+        // Dynamically build the registry URL and image tags
+        REGISTRY_URL   = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+        IMAGE_TAG      = "v${env.BUILD_ID}" // Uses Jenkins build number (e.g., v42)
+    }
+    
+    stages {
+        stage('Checkout Code') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    echo "Building image for ${ECR_REPO}..."
+                    // Build the image and tag it for your ECR registry
+                    sh "docker build -t ${REGISTRY_URL}/${ECR_REPO}:${IMAGE_TAG} ."
+                }
+            }
+        }
+        
+        stage('Authenticate to AWS ECR') {
+            steps {
+                // This block securely injects your AWS credentials into the shell
+                // Replace 'aws-credentials' with the ID of your credential in Jenkins
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding', 
+                    credentialsId: 'aws-credentials', 
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                ]]) {
+                    sh '''
+                        aws ecr get-login-password --region ${AWS_REGION} | \
+                        docker login --username AWS --password-stdin ${REGISTRY_URL}
+                    '''
+                }
+            }
+        }
+        
+        stage('Push to ECR') {
+            steps {
+                script {
+                    echo "Pushing ${IMAGE_TAG} to ${REGISTRY_URL}/${ECR_REPO}..."
+                    sh "docker push ${REGISTRY_URL}/${ECR_REPO}:${IMAGE_TAG}"
+                    
+                    // Optional: Tag and push as 'latest' so the most recent build is easily identifiable
+                    sh "docker tag ${REGISTRY_URL}/${ECR_REPO}:${IMAGE_TAG} ${REGISTRY_URL}/${ECR_REPO}:latest"
+                    sh "docker push ${REGISTRY_URL}/${ECR_REPO}:latest"
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            // Clean up the local Jenkins workspace to prevent disk space issues
+            script {
+                sh "docker rmi ${REGISTRY_URL}/${ECR_REPO}:${IMAGE_TAG} || true"
+                sh "docker rmi ${REGISTRY_URL}/${ECR_REPO}:latest || true"
+            }
+        }
+    }
+}
