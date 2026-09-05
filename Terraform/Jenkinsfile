@@ -10,27 +10,33 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git credentialsId: 'Githubpass', url: 'https://github.com/Sandesh2080/Boardgame/tree/7d186fd8c5f7ae1cca5def0234af03975b50ea9d/Terraform', branch: 'main'
+                git credentialsId: 'Githubpass', url: 'https://github.com/Sandesh2080/Boardgame.git', branch: 'main'
             }
         }
 
         stage('Terraform Init') {
             steps {
-                sh 'terraform init'
+                dir('Terraform') {
+                    sh 'terraform init'
+                }
             }
         }
 
         stage('Terraform Plan') {
             steps {
-                // Creates a plan file so we know exactly what will be applied
-                sh 'terraform plan -out=tfplan'
+                dir('Terraform') {
+                    // Creates a plan file so we know exactly what will be applied
+                    sh 'terraform plan -out=tfplan'
+                }
             }
         }
 
         stage('Terraform Apply') {
             steps {
-                // The -auto-approve equivalent is necessary in CI/CD so it doesn't wait for human typing
-                sh 'terraform apply -input=false tfplan'
+                dir('Terraform') {
+                    // The -auto-approve equivalent is necessary in CI/CD so it doesn't wait for human typing
+                    sh 'terraform apply -input=false tfplan'
+                }
             }
         }
     }
