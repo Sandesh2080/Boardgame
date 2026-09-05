@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git credentialsId: 'Githubpass', url: 'https://github.com/Sandesh2080/Boardgame/Terraform.git', branch: 'main'
+                git credentialsId: 'Githubpass', url: 'https://github.com/Sandesh2080/Boardgame/blob/632e353d45bc8900c9a655665d68b496de39a439/Terraform/main.tf', branch: 'main'
             }
         }
 
