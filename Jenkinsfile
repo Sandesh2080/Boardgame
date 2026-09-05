@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'podman' }
+    agent any
 
     environment {
         AWS_ACCOUNT_ID = "045973518289"
