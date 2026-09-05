@@ -1,6 +1,8 @@
 pipeline {
-    agent any
-
+    agent
+    {
+        label 'Podman'
+    }
     environment {
         AWS_ACCOUNT_ID = "045973518289"
         AWS_CRED = "${env.AWS_CRED}"
