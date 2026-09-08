@@ -40,7 +40,7 @@ pipeline {
         stage('Build & Push to ECR') {
             steps {
                 script {
-                    withAWS(credentials: 'AWS_CRED', region: "${AWS_REGION}") {
+                    withAWS(credentials: "${AWS_CRED}", region: "${AWS_REGION}") {
                         sh '''
                             #!/bin/bash
                             set -eux
