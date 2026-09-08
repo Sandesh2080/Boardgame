@@ -32,7 +32,9 @@ pipeline {
         stage('Build Image') {
             steps {
                 sh '''
-                    docker build -t board-game .
+                    docker build --load \
+                      -t board-game:latest \
+                      -t ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/dev/microsvc:latest .
                 '''
             }
         }
