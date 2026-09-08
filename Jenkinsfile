@@ -5,13 +5,23 @@ pipeline {
     }
     environment {
         AWS_ACCOUNT_ID = "045973518289"
-        AWS_CRED = "${env.aws-credentials-id}"
-        AWS_REGION     = "${env.AWS_REGION ?: 'us-east-1'}"
+        AWS_CRED = "aws-credentials-id"
+        AWS_REGION     = "us-east-1"
         IMAGE_NAME     = "dev/microsvc"
         ECR_REPO       = "045973518289.dkr.ecr.us-east-1.amazonaws.com/dev/microsvc"
     }
 
     stages {
+
+        stage('Checkout') {
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[url: 'https://github.com/Sandesh2080/Boardgame.git']]
+                ])
+            }
+        }
 
         stage('Build Application') {
             steps {
