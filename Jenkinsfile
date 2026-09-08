@@ -55,11 +55,11 @@ pipeline {
                                     --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
                             echo "===== Tagging Image ====="
-                            podman tag board-game:latest \
+                            docker tag board-game:latest \
                                 ${ECR_REPO}:latest
 
                             echo "===== Pushing Image ====="
-                            podman push \
+                            docker push \
                                 ${ECR_REPO}:latest
 
                             echo "===== DONE ====="
