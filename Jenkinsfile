@@ -22,7 +22,7 @@ pipeline {
         stage('Build Image') {
             steps {
                 sh '''
-                    podman build -t board-game .
+                    docker build -t board-game .
                 '''
             }
         }
