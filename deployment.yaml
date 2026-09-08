@@ -20,4 +20,4 @@ spec:
         ports:
         - containerPort: 8080
       imagePullSecrets:
-      - name: ecr-registry-helper  # <--- THIS MUST MATCH THE SECRET NAME
+      - name: ECR_PASSWORD  # <--- THIS MUST MATCH THE SECRET NAME
