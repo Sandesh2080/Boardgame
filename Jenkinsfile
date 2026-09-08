@@ -5,7 +5,7 @@ pipeline {
     }
     environment {
         AWS_ACCOUNT_ID = "045973518289"
-        AWS_CRED = "${env.AWS_CRED}"
+        AWS_CRED = "${env.aws-credentials-id}"
         AWS_REGION     = "${env.AWS_REGION ?: 'us-east-1'}"
         IMAGE_NAME     = "dev/microsvc"
         ECR_REPO       = "045973518289.dkr.ecr.us-east-1.amazonaws.com/dev/microsvc"
