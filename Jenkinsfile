@@ -50,7 +50,7 @@ pipeline {
 
                             echo "===== Logging into ECR ====="
                             aws ecr get-login-password \
-                                | podman login \
+                                | docker login \
                                     --username AWS \
                                     --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
